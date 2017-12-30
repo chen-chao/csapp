@@ -7,7 +7,7 @@ size_t strlen(const char *s);
 /* WARNING: this function is buggy */
 
 int strlonger(char *s, char *t) {
-    return strlen(s) - strlen(t) > 0;
+    return strlen(s) > strlen(t);
 }
 
 int main() {
