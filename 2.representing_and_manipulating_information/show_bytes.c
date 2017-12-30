@@ -1,6 +1,5 @@
 #include <stdio.h>
-
-typedef unsigned char *byte_pointer;
+#include "csapp2.h"
 
 void show_bytes(byte_pointer start, int len) {
     int i;
@@ -19,4 +18,13 @@ void show_float(float x) {
 
 void show_pointer(void *x) {
     show_bytes((byte_pointer) x, sizeof(void *));
+}
+
+void show_val(int val) {
+    int ival = val;
+    float fval = (float) ival;
+    int *pval = &ival;
+    show_int(ival);
+    show_float(fval);
+    show_pointer(pval);
 }
