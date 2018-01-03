@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <limits.h>
+#include <stdlib.h>
 #include "csapp2.h"
 
 
@@ -18,6 +19,7 @@ unsigned unsigned_high_prod(unsigned x, unsigned y) {
     show_bytes((byte_pointer) &htmp, sizeof(unsigned));
     unsigned ltmp = low_x*high_y + low_y*high_x;
     unsigned rtmp = ltmp >> halfw;
+    printf("l part:");
     show_bytes((byte_pointer) &rtmp, sizeof(unsigned));
 #endif
     return high_x*high_y + ((low_x*high_y + low_y*high_x) >> halfw);
@@ -77,8 +79,8 @@ int main(int argc, char *argv[]) {
         printf("Argument number should be 3, current %d\n", argc);
         return -1;
     }
-    int x = parse_value(*++argv);
-    int y = parse_value(*++argv);
+    int x = strtol(*++argv, NULL, 0);
+    int y = strtol(*++argv, NULL, 0);
     print_prod(x, y);
     return 0;
 }
