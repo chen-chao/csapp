@@ -4,23 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "csapp2.h"
 
 #define MAXLEN 100
-
-typedef unsigned char *byte_pointer;
-
-void get_bit(byte_pointer bp, char *s) {
-    for (int i = 7; i >= 0; *bp /= 2, i--) {
-        s[i] = *bp % 2 + '0';
-    }
-    s[8] = '\0';
-}
-
-void get_bits(byte_pointer start, int len, char *s) {
-    for (int i = 0; i < len; i++, s += 8){
-        get_bit(start+i, s);
-    }
-}
 
 int longest_substring(char *s, char *t, int *sstart, int *tstart) {
     int m = strlen(s)+1;

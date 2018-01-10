@@ -28,3 +28,17 @@ void show_val(int val) {
     show_float(fval);
     show_pointer(pval);
 }
+
+void get_bit(byte_pointer bp, char *s) {
+    for (int i = 7; i >= 0; *bp /= 2, i--) {
+        s[i] = *bp % 2 + '0';
+    }
+    s[8] = '\0';
+}
+
+void get_bits(byte_pointer start, int len, char *s) {
+    /* it's different between big endian and little endian machine */
+    for (int i = 0; i < len; i++, s += 8){
+        get_bit(start+i, s);
+    }
+}
