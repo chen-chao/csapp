@@ -29,6 +29,11 @@ void show_val(int val) {
     show_pointer(pval);
 }
 
+unsigned is_little_endian() {
+    unsigned a = 0x1;
+    return *((unsigned char *) &a);
+}
+
 void get_bit(byte_pointer bp, char *s) {
     for (int i = 7; i >= 0; *bp /= 2, i--) {
         s[i] = *bp % 2 + '0';
@@ -37,8 +42,11 @@ void get_bit(byte_pointer bp, char *s) {
 }
 
 void get_bits(byte_pointer start, int len, char *s) {
-    /* it's different between big endian and little endian machine */
-    for (int i = 0; i < len; i++, s += 8){
-        get_bit(start+i, s);
+    int little_endian = is_little_endian();
+    byte_pointer bp = little_endian == 1 ? start+len-1 : start;
+    int delta = little_endian == 1 ? -1 : 1;
+
+    for (int i = 0; i < len; i++, s += 8, bp += delta)  {
+        get_bit(bp, s);
     }
 }
