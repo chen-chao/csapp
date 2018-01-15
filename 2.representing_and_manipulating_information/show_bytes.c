@@ -35,8 +35,9 @@ unsigned is_little_endian() {
 }
 
 void get_bit(byte_pointer bp, char *s) {
-    for (int i = 7; i >= 0; *bp /= 2, i--) {
-        s[i] = *bp % 2 + '0';
+    unsigned val = *bp;
+    for (int i = 7; i >= 0; val /= 2, i--) {
+        s[i] = val % 2 + '0';
     }
     s[8] = '\0';
 }
