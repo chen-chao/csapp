@@ -4,6 +4,20 @@
 #include <string.h>
 #include <sys/stat.h>
 
+
+/* 10.8
+ *
+ * unix> fstatcheck 3 < foo.txt
+ *
+ * will raise "Bad file descriptor error", so shell closed before executing commands:
+ *
+ * if (Fork() == 0) {
+ *     dup2(0, 3) ? redirect 3 to stdin
+ *     Execve("fstatcheck", argv, envp);
+ * }
+ */
+
+
 void unix_error(char *msg) {
   fprintf(stderr, "%s: %s\n", msg, strerror(errno));
   exit(0);
