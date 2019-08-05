@@ -152,9 +152,7 @@ int bitXor(int x, int y) {
  *   Rating: 1
  */
 int tmin(void) {
-
-  return 2;
-
+  return 1 << 31;
 }
 //2
 /*
@@ -165,7 +163,8 @@ int tmin(void) {
  *   Rating: 1
  */
 int isTmax(int x) {
-  return 2;
+  int tmax = ~(1 << 31);
+  return !(x ^ tmax);
 }
 /*
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
@@ -186,7 +185,7 @@ int allOddBits(int x) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+  return (~x) + 1;
 }
 //3
 /*
@@ -199,8 +198,12 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  return 2;
+  int digit0 = x + 1 + (~0x30);
+  int digit9 = 0xA + (~digit0);
+  // assumming 32 bit integer
+  return ~((digit0 >> 31) & (digit9 >> 31));
 }
+
 /*
  * conditional - same as x ? y : z
  *   Example: conditional(2,4,5) = 4
@@ -209,7 +212,14 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+  int bit = !x;
+  // assumming 32 bit integer
+  bit = bit | (bit << 1);
+  bit = bit | (bit << 2);
+  bit = bit | (bit << 4);
+  bit = bit | (bit << 8);
+  bit = bit | (bit << 16);
+  return (~bit & y) | (bit & z);
 }
 /*
  * isLessOrEqual - if x <= y  then return 1, else return 0
@@ -219,7 +229,9 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+  int delta = x + (~y) + 1;
+  // assumming 32 bit integer
+  return ((delta >> 31) & 0x1) | !(x ^ y);
 }
 //4
 /*
@@ -231,7 +243,14 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4
  */
 int logicalNeg(int x) {
-  return 2;
+  // assumming 32 bit integer
+  int neg = ~x;
+  neg = neg & (neg >> 1);
+  neg = neg & (neg >> 2);
+  neg = neg & (neg >> 4);
+  neg = neg & (neg >> 8);
+  neg = neg & (neg >> 16);
+  return neg & 0x1;
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
@@ -246,6 +265,7 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
+
   return 0;
 }
 //float
