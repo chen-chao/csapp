@@ -176,7 +176,10 @@ int isTmax(int x) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-  return !(~((x << 1) ^ x) ^ 0x1);
+  int mask = 0xAA;
+  mask |= (mask << 8);
+  mask |= (mask << 16);
+  return !(~x & mask);
 }
 /*
  * negate - return -x
@@ -199,6 +202,7 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
+  // TODO: overflow!
   int digit0 = x + 1 + (~0x30);
   int digit9 = 0x3A + (~x);
   // assumming 32 bit integer
@@ -282,7 +286,27 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
-  return 2;
+  unsigned exp = (uf << 1) >> 24;
+  unsigned frac = (uf << 9) >> 9;
+  unsigned sign = (uf >> 31) << 31;
+  unsigned inf = 0xFF;
+  if (!exp) {
+    // irregular number
+    return (uf << 1) | sign;
+  } else if (!(exp ^ inf)){
+    // infinity and NaN
+    return uf;
+  } else {
+    // regular number
+    exp++;
+    if (!(exp ^ inf)) {
+      // overflow
+      return (inf << 23) | sign;
+    } else {
+      // exp << 1
+      return (exp << 23) | sign | frac;
+    }
+  }
 }
 /*
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
@@ -297,7 +321,37 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  return 2;
+  unsigned exp = (uf << 1) >> 24;
+  unsigned frac = (uf << 9) >> 9;
+  unsigned sign = (uf >> 31) << 31;
+  unsigned inf = 0xFF;
+  int result = 0;
+
+  if (!(exp ^ inf)) {
+    // infinity and NaN
+    return 1 << 31;
+  } else {
+    exp += (~0x7F + 1);
+    if (exp >> 7) {
+      // negative exp
+      return 0;
+    } else {
+      // non-negative exp
+      if (exp >= 31) {
+	// overflow
+	return 1 << 31;
+      } else if (exp >= 23) {
+	result = (1 << exp) + (frac << (exp - 23));
+      } else {
+	result = (1 << exp) + (frac >> (23 - exp));
+      }
+      if (sign) {
+	return ~result + 1;
+      } else {
+	return result;
+      }
+    }
+  }
 }
 /*
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
@@ -313,5 +367,22 @@ int floatFloat2Int(unsigned uf) {
  *   Rating: 4
  */
 unsigned floatPower2(int x) {
-    return 2;
+  // max positive regular number: 2^128-2^104
+  // min positive regular number: 2^(-126)
+  // min positive irregular number: 2^(-149)
+  unsigned inf = (0xff) << 23;
+  if (x > 127) {
+    // overflow
+    return inf;
+  } else if (x >= -126) {
+    // regular number
+    unsigned exp = x + 0x7f;
+    return exp << 23;
+  } else if (x >= -149) {
+    // irregular number
+    unsigned frac = 149-x;
+    return 1 << frac;
+  } else {
+    return 0;
+  }
 }
