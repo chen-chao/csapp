@@ -234,9 +234,12 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
+  int xsign = (x >> 31) & 0x1;
+  int ysign = (y >> 31) & 0x1;
+
   int delta = x + (~y) + 1;
   // assumming 32 bit integer
-  return ((delta >> 31) & 0x1) | !(x ^ y);
+  return ((delta >> 31) & 0x1) | !delta;
 }
 //4
 /*
@@ -270,8 +273,46 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
+  if (x >> 31) {
+    x = ~x;
+  }
 
-  return 0;
+  int num = 16;
+  int mask = 0xFFFF0000;
+
+  if (mask & x) {
+    mask <<= 8;
+    num -= 8;
+  } else {
+    mask >>= 8;
+    num += 8;
+  }
+
+  if (mask & x) {
+    mask <<= 4;
+    num -= 4;
+  } else {
+    mask >>= 4;
+    num += 4;
+  }
+
+  if (mask & x) {
+    mask <<= 2;
+    num -= 2;
+  } else {
+    mask >>= 2;
+    num += 2;
+  }
+
+  if (mask & x) {
+    mask <<= 1;
+    num -= 1;
+  } else {
+    mask >>= 1;
+    num += 1;
+  }
+
+  return 32-num;
 }
 //float
 /*
