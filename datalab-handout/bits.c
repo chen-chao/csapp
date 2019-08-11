@@ -230,14 +230,33 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  int xsign = (x >> 31) & 0x1;
-  int ysign = (y >> 31) & 0x1;
-  int x0y = !(xsign ^ 1) & !ysign;
-  int y0x = !xsign & !(ysign ^ 1);
+  int diff = x ^ y;
+  // mask = 0x80000000
+  int mask = 1 << 31;
+  // get diff's first bit
+  diff |= (diff >> 1);
+  diff |= (diff >> 2);
+  diff |= (diff >> 4);
+  diff |= (diff >> 8);
+  diff |= (diff >> 16);
+  diff &= ~(diff >> 1) | (1 << 31);
 
-  // overflow of signed integers is undefined behavior
-  int delta = x + (~y) + 1;
-  return (!y0x) & (x0y | ((delta >> 31) & 0x1) | !delta);
+  // if diff's sign bit is 0 then x and y's sign bits are the same,
+  // else they are different.
+
+  // when they are different, x's sign bit has to be 1 to be the
+  // smaller one and y's sign bit doesn't matter.
+
+  // when their sign bits are same, the first 1 bit of diff must be
+  // the same as y's to let y be the larger. x's other bits don't
+  // matter. in other words, reverse of x's other bits has to match
+  // diff's 1 bit.
+
+  // another method, lessEqual = !great
+  //  diff &= (x ^ mask) & (y ^ ~mask);
+  // return !diff;
+
+  return !diff | !!(diff & (x ^ ~mask));
 }
 //4
 /*
