@@ -232,10 +232,12 @@ int conditional(int x, int y, int z) {
 int isLessOrEqual(int x, int y) {
   int xsign = (x >> 31) & 0x1;
   int ysign = (y >> 31) & 0x1;
+  int x0y = !(xsign ^ 1) & !ysign;
+  int y0x = !xsign & !(ysign ^ 1);
 
+  // overflow of signed integers is undefined behavior
   int delta = x + (~y) + 1;
-  // assumming 32 bit integer
-  return ((delta >> 31) & 0x1) | !delta;
+  return (!y0x) & (x0y | ((delta >> 31) & 0x1) | !delta);
 }
 //4
 /*
