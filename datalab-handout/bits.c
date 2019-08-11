@@ -269,43 +269,57 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
+  // counting the 0s from the most significant bit.
+  // the result is the remaining bits length plus 1(the sign bit).
   int sign = x >> 31;
   int condition = (sign << 31) >> 31;
+
+  // starting number and mask in binary search
+  int num = 16;
+  int mask = 0xFF;  // constant mustn't be larger than 0xFF
+  int left, move;   // decides searching left or right
+
+  // using ~x if x < 0
   x = (~condition & x) | (condition & (~x));
 
-  int num =  16;
-  // mask = 0xFFFF0000;
-  int mask = 0xFF;
-  mask |= (mask << 8);
-  mask |= (mask << 16);
-
-  int left, move;
+  // mask = 0xFFFF0000
+  mask = mask | (mask << 8);
+  mask = mask << 16;
 
   left = mask & x;
   condition = (!left << 31) >> 31;
   mask = (~condition & (mask << 8)) | (condition & (mask >> 8));
-  move = (~condition & (-8)) | (condition & 8);
+  move = (~condition & (~7)) | (condition & 8);
   num += move;
 
   left = mask & x;
   condition = (!left << 31) >> 31;
   mask = (~condition & (mask << 4)) | (condition & (mask >> 4));
-  move = (~condition & (-4)) | (condition & 4);
+  move = (~condition & (~3)) | (condition & 4);
   num += move;
 
   left = mask & x;
   condition = (!left << 31) >> 31;
   mask = (~condition & (mask << 2)) | (condition & (mask >> 2));
-  move = (~condition & (-2)) | (condition & 2);
+  move = (~condition & (~1)) | (condition & 2);
   num += move;
 
   left = mask & x;
   condition = (!left << 31) >> 31;
   mask = (~condition & (mask << 1)) | (condition & (mask >> 1));
-  move = (~condition & (-1)) | (condition & 1);
+  move = (~condition & (~0)) | (condition & 1);
   num += move;
 
-  return 33+ (~num);
+  // decide the last 1 bit
+  move = !(mask & x);
+  num += move;
+
+  // the above steps assume ther is at least one 1 bit in x.
+  // testing if x == 0x0
+  move = !x;
+  num += move;
+
+  return 35 + (~num);
 }
 //float
 /*
