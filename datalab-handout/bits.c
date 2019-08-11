@@ -281,6 +281,11 @@ int howManyBits(int x) {
 
   // using ~x if x < 0
   x = (~condition & x) | (condition & (~x));
+  // since x is a non-negative number, its sign bit is always 0,
+  // we could move it to left by 1 bit to avoid checking if x == 0.
+  // because if the assuming 1 is at the least significant bit,
+  // then x must be 0.
+  x = x << 1;
 
   // mask = 0xFFFF0000
   mask = mask | (mask << 8);
@@ -316,10 +321,10 @@ int howManyBits(int x) {
 
   // the above steps assume ther is at least one 1 bit in x.
   // testing if x == 0x0
-  move = !x;
-  num += move;
+  // move = !x;
+  // num += move;
 
-  return 35 + (~num);
+  return 34 + (~num);
 }
 //float
 /*
