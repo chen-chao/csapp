@@ -219,12 +219,8 @@ int isAsciiDigit(int x) {
 int conditional(int x, int y, int z) {
   int bit = !x;
   // assumming 32 bit integer
-  bit = bit | (bit << 1);
-  bit = bit | (bit << 2);
-  bit = bit | (bit << 4);
-  bit = bit | (bit << 8);
-  bit = bit | (bit << 16);
-  return (~bit & y) | (bit & z);
+  int mask = (bit << 31) >> 31;
+  return (~mask & y) | (mask & z);
 }
 /*
  * isLessOrEqual - if x <= y  then return 1, else return 0
@@ -273,46 +269,43 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-  if (x >> 31) {
-    x = ~x;
-  }
+  int sign = x >> 31;
+  int condition = (sign << 31) >> 31;
+  x = (~condition & x) | (condition & (~x));
 
-  int num = 16;
-  int mask = 0xFFFF0000;
+  int num =  16;
+  // mask = 0xFFFF0000;
+  int mask = 0xFF;
+  mask |= (mask << 8);
+  mask |= (mask << 16);
 
-  if (mask & x) {
-    mask <<= 8;
-    num -= 8;
-  } else {
-    mask >>= 8;
-    num += 8;
-  }
+  int left, move;
 
-  if (mask & x) {
-    mask <<= 4;
-    num -= 4;
-  } else {
-    mask >>= 4;
-    num += 4;
-  }
+  left = mask & x;
+  condition = (!left << 31) >> 31;
+  mask = (~condition & (mask << 8)) | (condition & (mask >> 8));
+  move = (~condition & (-8)) | (condition & 8);
+  num += move;
 
-  if (mask & x) {
-    mask <<= 2;
-    num -= 2;
-  } else {
-    mask >>= 2;
-    num += 2;
-  }
+  left = mask & x;
+  condition = (!left << 31) >> 31;
+  mask = (~condition & (mask << 4)) | (condition & (mask >> 4));
+  move = (~condition & (-4)) | (condition & 4);
+  num += move;
 
-  if (mask & x) {
-    mask <<= 1;
-    num -= 1;
-  } else {
-    mask >>= 1;
-    num += 1;
-  }
+  left = mask & x;
+  condition = (!left << 31) >> 31;
+  mask = (~condition & (mask << 2)) | (condition & (mask >> 2));
+  move = (~condition & (-2)) | (condition & 2);
+  num += move;
 
-  return 32-num;
+  left = mask & x;
+  condition = (!left << 31) >> 31;
+  mask = (~condition & (mask << 1)) | (condition & (mask >> 1));
+  move = (~condition & (-1)) | (condition & 1);
+  num += move;
+
+  return 33+ (~num);
 }
 //float
 /*
