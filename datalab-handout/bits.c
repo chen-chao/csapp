@@ -256,7 +256,8 @@ int isLessOrEqual(int x, int y) {
   //  diff &= (x ^ mask) & (y ^ ~mask);
   // return !diff;
 
-  return !diff | !!(diff & (x ^ ~mask));
+  /* return !diff | !!(diff & (x ^ ~mask)); */
+  return !(diff & (x ^ mask));
 }
 //4
 /*
