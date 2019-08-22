@@ -202,11 +202,11 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  // TODO: overflow!
-  int digit0 = x + 1 + (~0x30);
-  int digit9 = 0x3A + (~x);
-  // assumming 32 bit integer
-  return !(((digit0 >> 31) | (digit9 >> 31)) & 0x1);
+  // last 4 bit < 10
+  int last4 = (x & 0xF) + (~0xA + 1);
+  // first 28 bit must be 0x3
+  int first28 = (x >> 4) ^ 0x3;
+  return (!first28) & (last4 >> 31);
 }
 
 /*
