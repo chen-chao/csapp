@@ -22,10 +22,10 @@ int main() {
     unix_error("signal error");
 
   /* Parent creates children */
-  for (i = 0; i < 3; i++) {
+  for (i = 0; i < 10; i++) {
     if (Fork() == 0) {
       printf("Hello from child %d\n", (int)getpid());
-      Sleep(1);
+      Sleep(i);
       exit(0);
     }
   }
@@ -46,8 +46,6 @@ int main() {
       unix_error("read error");
 
   printf("Parent processing input\n");
-  while (1)
-    ;
 
   exit(0);
 }
